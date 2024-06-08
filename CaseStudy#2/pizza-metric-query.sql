@@ -14,7 +14,7 @@ FROM customer_orders;
 -- 3. How many successful orders were delivered by each runner?
 SELECT runner_id, COUNT(order_id) AS successful_orders
 FROM runner_orders
-WHERE cancellation IS NULL OR cancellation = ''
+WHERE cancellation IS NULL
 GROUP BY runner_id;
 
 -- 4. How many of each type of pizza was delivered?
@@ -22,7 +22,7 @@ SELECT pn.pizza_name, COUNT(co.order_id) AS delivered_pizzas
 FROM customer_orders co
          JOIN runner_orders ro ON co.order_id = ro.order_id
          JOIN pizza_names pn ON co.pizza_id = pn.pizza_id
-WHERE ro.cancellation IS NULL OR ro.cancellation = ''
+WHERE ro.cancellation IS NULL
 GROUP BY pn.pizza_name;
 
 -- 5. How many Vegetarian and Meatlovers were ordered by each customer?
@@ -38,27 +38,27 @@ FROM
     (SELECT co.order_id, COUNT(co.pizza_id) AS total_pizzas
     FROM customer_orders co
         JOIN runner_orders ro ON co.order_id = ro.order_id
-    WHERE ro.cancellation IS NULL or ro.cancellation = ''
+    WHERE ro.cancellation IS NULL
     GROUP BY co.order_id) as subquery;
 
 -- 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 SELECT co.customer_id,
-       COUNT(CASE WHEN (co.exclusions IS NOT NULL AND co.exclusions <> '')
-           OR (co.extras IS NOT NULL AND co.extras <> '') THEN 1 END) AS with_changes,
-       COUNT(CASE WHEN (co.exclusions IS NULL OR co.exclusions = '')
-           AND (co.extras IS NULL OR co.extras = '') THEN 1 END) AS without_changes
+       COUNT(CASE WHEN (co.exclusions IS NOT NULL)
+           OR (co.extras IS NOT NULL) THEN 1 END) AS with_changes,
+       COUNT(CASE WHEN (co.exclusions IS NULL)
+           AND (co.extras IS NULL) THEN 1 END) AS without_changes
 FROM customer_orders co
          JOIN runner_orders ro ON co.order_id = ro.order_id
-WHERE ro.cancellation IS NULL OR ro.cancellation = ''
+WHERE ro.cancellation IS NULL
 GROUP BY co.customer_id;
 
 -- 8. How many pizzas were delivered that had both exclusions and extras?
 SELECT COUNT(*)
 FROM customer_orders co
 JOIN runner_orders ro ON co.order_id = ro.order_id
-WHERE (co.exclusions IS NOT NULL AND co.exclusions <> '' )
-  AND (co.extras IS NOT NULL AND co.extras <> '')
-  AND (ro.cancellation IS NULL OR ro.cancellation = '');
+WHERE (co.exclusions IS NOT NULL )
+  AND (co.extras IS NOT NULL)
+  AND (ro.cancellation IS NULL);
 
 -- 9. What was the total volume of pizzas ordered for each hour of the day?
 SELECT EXTRACT(HOUR FROM co.order_time) as hour_of_day, COUNT(*) as total_pizzas_ordered

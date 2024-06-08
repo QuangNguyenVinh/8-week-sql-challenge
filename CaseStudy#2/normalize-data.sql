@@ -7,12 +7,12 @@ ALTER COLUMN extras TYPE TEXT;
 
 -- Replace NULL values with empty strings in the exclusions and extras columns.
 UPDATE customer_orders
-SET exclusions = ''
-WHERE exclusions IS NULL;
+SET exclusions = NULL
+WHERE exclusions = '' OR exclusions = 'null';
 
 UPDATE customer_orders
-SET extras = ''
-WHERE extras IS NULL;
+SET extras = NULL
+WHERE extras = '' OR extras = 'null';
 
 -- Remove the units (e.g., "km") from the distance column.
 UPDATE runner_orders
