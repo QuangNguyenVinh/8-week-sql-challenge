@@ -25,6 +25,14 @@ SET distance = NULL
 WHERE distance IS NOT NULL AND NOT distance ~ '^[0-9]+(\.[0-9]+)?$';
 
 -- Convert `pickup_time` to TIMESTAMP, `distance` to numeric, and `duration` to interval
+UPDATE runner_orders
+SET duration = CAST(SUBSTRING(duration FROM '[0-9]+') || ' minutes' AS INTERVAL);
+
+ALTER TABLE runner_orders
+    ALTER COLUMN pickup_time TYPE TIMESTAMP USING NULLIF(pickup_time, 'null')::TIMESTAMP,
+    ALTER COLUMN distance TYPE NUMERIC USING NULLIF(distance, 'null')::NUMERIC,
+    ALTER COLUMN duration TYPE INTERVAL USING NULLIF(duration, 'null')::INTERVAL;
+
 ALTER TABLE runner_orders
 ALTER COLUMN pickup_time TYPE TIMESTAMP USING NULLIF(pickup_time, 'null')::TIMESTAMP,
 ALTER COLUMN distance TYPE NUMERIC USING NULLIF(distance, 'null')::NUMERIC,
@@ -32,5 +40,5 @@ ALTER COLUMN duration TYPE INTERVAL USING NULLIF(duration, 'null')::INTERVAL;
 
 -- Replace `NULL` values in `cancellation` column with an empty string
 UPDATE runner_orders
-SET cancellation = ''
-WHERE cancellation IS NULL;
+SET cancellation = NULL
+WHERE cancellation = '' OR cancellation = 'null';
