@@ -14,4 +14,4 @@ FROM sales s
 SELECT ROUND(SUM((discount * (qty * s.price) / 100.0)), 2) AS total_discounts
 FROM sales s
          JOIN product_details pd
-              ON s.prod_id = pd.product_id
+              ON s.prod_id = pd.product_id;
